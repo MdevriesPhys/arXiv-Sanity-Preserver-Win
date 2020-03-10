@@ -3,5 +3,5 @@ Derived directly from [arXiv Sanity Preserver](http://www.arxiv-sanity.com/), de
 
 ASP-Win intends to be the next step for this - running locally in Windows with a GUI interface, with different modules being loaded as required (à la [QuDi](https://github.com/Ulm-IQO/qudi)).
 
-### This is an evolution of the original arXiv Santiy Preserver
+### This is an evolution of the original arXiv Santiy Preserver, using lots of the core code from QuDi
 Give them love, I'm just standing on their shoulders!
