@@ -1,0 +1,15 @@
+# Makes sure that the junk folder from pycharm isn't pushed onto git
+.ideas/
+# Temp files produced from scripts (copied over from arXiv Sanity Preserver)
+tmp/
+pdf/
+txt/
+static/thumbs/
+*.p
+*.pyc
+as.db
+secret_key.txt
+env/
+data
+*.DS_Store
+twitter.txt
