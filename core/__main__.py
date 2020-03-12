@@ -1,35 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-
-"""
-
-
 import sys
-import os
 
 import faulthandler
 faulthandler.disable()
 faulthandler.enable(all_threads=True)
 
-
 # parse commandline parameters
 import argparse
 parser = argparse.ArgumentParser(prog='start.py')
 group = parser.add_mutually_exclusive_group()
-group.add_argument('-p', '--profile', action='store_true',
-        help='enables profiler')
-group.add_argument('-cg', '--callgraph', action='store_true',
-        help='display dependencies between the methods/modules')
-parser.add_argument('-m', '--manhole', action='store_true',
-        help='manhole for debugging purposes')
-parser.add_argument('-g', '--no-gui', action='store_true',
-        help='does not load the manager gui module')
-parser.add_argument('-c', '--config', default='', help='configuration file')
+parser.add_argument('-c', '--config', default='default.cfg', help='configuration file')
 parser.add_argument('-l', '--logdir', default='', help='log directory')
 args = parser.parse_args()
 
-
-# install logging facility
 from .logger import initialize_logger
 initialize_logger(args.logdir)
 import logging
@@ -39,26 +21,8 @@ print("Loading arXiv Sanity Preserver - Win")
 print("Reticulating splines")
 print('Preserving Sanity...')
 
-
-# this loads Qt and makes sure the API version is right with PyQt4
-if __package__ is None:
-    import core
-    __package__ = 'core'
-else:
-    import core
-
-
 # define a global variable for the manager
 man = None
-
-# Until here every module is in the python standard library.
-# Check vital packages for qudi, otherwise qudi will not even start.
-from core.util.helpers import import_check
-err_code = import_check()
-
-if err_code != 0:
-    sys.exit(err_code)
-
 
 # install logging facility for Qt errors
 import qtpy
@@ -99,32 +63,8 @@ else:
 
 
 # instantiate Qt Application (gui or non-gui)
-if args.no_gui:
-    app = QtCore.QCoreApplication(sys.argv)
-else:
-    from qtpy import QtWidgets
-    app = QtWidgets.QApplication(sys.argv)
-
-
-# Install the pyzmq ioloop. This has to be done before anything else from
-# tornado is imported.
-try:
-    from zmq.eventloop import ioloop
-    ioloop.install()
-except:
-    logger.error('Preparing ZMQ failed, probably no IPython possible!')
-
-
-# Disable standard garbage collector and run it from the event loop to
-# improve stability.
-# (see garbage_collector in the doc for more information)
-from .garbage_collector import GarbageCollector
-gc = GarbageCollector(interval=1.0, debug=False)
-
-
-# define a watchdog for our application
-from .parentpoller import ParentPollerWindows, ParentPollerUnix
-
+from qtpy import QtWidgets
+app = QtWidgets.QApplication(sys.argv)
 
 class AppWatchdog(QtCore.QObject):
     """This class periodically runs a function for debugging and handles
@@ -135,7 +75,7 @@ class AppWatchdog(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.alreadyQuit = False
-        self.hasGui = False
+
         self.exitcode = 0
         # Run python code periodically to allow interactive debuggers to interrupt
         # the qt event loop
@@ -151,24 +91,6 @@ class AppWatchdog(QtCore.QObject):
         x = 0
         for i in range(0, 100):
             x += i
-
-    def setupParentPoller(self, manager):
-        """ Set up parent pooler to find out when parent process is killed.
-
-            @param manager Manager: manager reference
-        """
-        self.parent_handle = int(os.environ.get('QUDI_PARENT_PID') or 0)
-        self.interrupt = int(os.environ.get('QUDI_INTERRUPT_EVENT') or 0)
-        if sys.platform == 'win32':
-            if self.interrupt or self.parent_handle:
-                self.poller = ParentPollerWindows(lambda: self.quitProxy(manager), self.interrupt, self.parent_handle)
-                self.poller.start()
-        elif self.parent_handle:
-            self.poller = ParentPollerUnix(lambda: self.quitProxy(manager))
-            self.poller.start()
-        else:
-            logger.warning('Qudi running unsupervised, restart wiill not work.')
-
 
     def quitProxy(self, obj):
         """ Helper function to emit doQuit signal
@@ -200,96 +122,13 @@ class AppWatchdog(QtCore.QObject):
             print('Stopping threads...')
             manager.tm.quitAllThreads()
             QtCore.QCoreApplication.instance().processEvents()
-            logger.info('Qudi is closed!  Ciao.')
-            print('\n  Qudi is closed!  Ciao.')
+            logger.info('ASP-Win is closed!')
+            print("\n I'm scared, will I dream? \n Daiiiiissssyyyyyyy......")
         QtCore.QCoreApplication.instance().quit()
 
 
-# Create Manager. This configures devices and creates the main manager window.
-# Arguments parsed by argparse are passed to the Manager.
 from .manager import Manager
 watchdog = AppWatchdog()
 man = Manager(args=args)
 watchdog.setupParentPoller(man)
 man.sigManagerQuit.connect(watchdog.quitApplication)
-
-## for debugging with pdb
-#QtCore.pyqtRemoveInputHook()
-
-# manhole for debugging stuff inside the app from outside
-if args.manhole:
-    import manhole
-    manhole.install()
-
-
-# Start Qt event loop unless running in interactive mode and not using PySide.
-import core.util.helpers as helpers
-interactive = (sys.flags.interactive == 1) and not qtpy.PYSIDE
-
-if interactive:
-    logger.info('Interactive mode; not starting event loop.')
-    print('Interactive mode; not starting event loop.')
-
-    # import some modules which might be useful on the command line
-    import numpy as np
-
-    # Use CLI history and tab completion
-    import atexit
-    import os
-    historyPath = os.path.expanduser("~/.pyhistory")
-    try:
-        import readline
-    except ImportError:
-        print("Import Error in __main__: Module readline not available.")
-    else:
-        import rlcompleter
-        readline.parse_and_bind("tab: complete")
-        if os.path.exists(historyPath):
-            readline.read_history_file(historyPath)
-
-    def save_history(new_historyPath=historyPath):
-        try:
-            import readline
-        except ImportError:
-            print("Import Error in __main__: Module readline not available.")
-        else:
-            readline.write_history_file(new_historyPath)
-    atexit.register(save_history)
-else:
-    # non-interactive, start application in different modes
-    if args.profile:
-        # with profiler
-        import cProfile, pstats
-        from io import StringIO
-        pr = cProfile.Profile()
-        pr.enable()
-        # ... do something ...
-        app.exec_()
-        pr.disable()
-        s = StringIO()
-        sortby = 'cumulative'
-        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats()
-        print(s.getvalue())
-        # helpers.exit() causes python to exit before Qt has
-        # a chance to clean up.
-        # This avoids otherwise irritating exit crashes.
-        helpers.exit(watchdog.exitcode)
-    elif args.callgraph:
-        # with callgraph
-        from pycallgraph import PyCallGraph
-        from pycallgraph.output import GraphvizOutput
-        with PyCallGraph(output=GraphvizOutput()):
-            app.exec_()
-    elif not man.hasGui:
-        # without gui
-        app.exec_()
-        helpers.exit(watchdog.exitcode)
-    else:
-        # start regular
-        app.exec_()
-        # helpers.exit() causes python to exit before Qt has a chance to
-        # clean up.
-        # This avoids otherwise irritating exit crashes.
-        helpers.exit(watchdog.exitcode)
-

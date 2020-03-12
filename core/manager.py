@@ -79,7 +79,6 @@ class Manager(QtCore.QObject):
         self.tree['global'] = OrderedDict()
         self.tree['global']['startup'] = list()
 
-        self.hasGui = not args.no_gui
         self.currentDir = None
         self.baseDir = None
         self.alreadyQuit = False
@@ -114,65 +113,11 @@ class Manager(QtCore.QObject):
             self.configDir = os.path.dirname(config_file)
             self.readConfig(config_file)
 
-            # check first if remote support is enabled and if so create RemoteObjectManager
-            if RemoteObjectManager is None:
-                logger.error('Remote modules disabled. Rpyc not installed.')
-                self.rm = None
-            else:
-                self.rm = RemoteObjectManager(self)
-                # Create remote module server if specified in config file
-                if 'module_server' in self.tree['global']:
-                    if not isinstance(self.tree['global']['module_server'], dict):
-                        logger.error('"module_server" entry in "global" section of configuration'
-                                     ' file is not a dictionary.')
-                    else:
-                        # new style
-                        try:
-                            server_address = self.tree['global']['module_server'].get(
-                                'address',
-                                'localhost')
-                            server_port = self.tree['global']['module_server'].get(
-                                'port', 12345)
-                            certfile = self.tree['global']['module_server'].get(
-                                'certfile', None)
-                            keyfile = self.tree['global']['module_server'].get('keyfile', None)
-                            self.rm.createServer(server_address, server_port, certfile, keyfile)
-                            # successfully started remote server
-                            logger.info('Started server rpyc://{0}:{1}'.format(server_address,
-                                                                               server_port))
-                            self.remote_server = True
-                        except:
-                            logger.exception('Rpyc server could not be started.')
-                elif 'serveraddress' in self.tree['global']:
-                    logger.warning('Deprecated remote server settings. Please update to new '
-                                   'style. See documentation.')
-                    server_address = self.tree['global']['serveraddress']
-                    try:
-                        if 'serverport' in self.tree['global']:
-                            remote_port = self.tree['global']['serverport']
-                            logger.info('Remote port is configured to {0}'.format(remote_port))
-                        else:
-                            remote_port = 12345
-                            logger.info('Remote port is the standard {0}'.format(remote_port))
-                        if 'certfile' in self.tree['global']:
-                            certfile = self.tree['global']['certfile']
-                        else:
-                            certfile = None
-                        if 'keyfile' in self.tree['global']:
-                            keyfile = self.tree['global']['keyfile']
-                        else:
-                            keyfile = None
-                        self.rm.createServer(server_address, remote_port, certfile, keyfile)
-                        # successfully started remote server
-                        self.remote_server = True
-                    except:
-                        logger.exception('Remote server could not be started.')
-
-            logger.info('Qudi started.')
+            logger.info('ASP-Win started.')
 
             # Load startup things from config here
             if 'startup' in self.tree['global']:
-                # walk throug the list of loadable modules to be loaded on
+                # walk through the list of loadable modules to be loaded on
                 # startup and load them if appropriate
                 for key in self.tree['global']['startup']:
                     if key in self.tree['defined']['hardware']:
@@ -195,7 +140,7 @@ class Manager(QtCore.QObject):
                 logger.critical('No modules loaded during startup.')
 
     def getMainDir(self):
-        """Returns the absolut path to the directory of the main software.
+        """Returns the absolute path to the directory of the main software.
 
              @return string: path to the main tree of the software
 
