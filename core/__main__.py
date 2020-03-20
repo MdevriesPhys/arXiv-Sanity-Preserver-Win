@@ -126,9 +126,8 @@ class AppWatchdog(QtCore.QObject):
             print("\n I'm scared, will I dream? \n Daiiiiissssyyyyyyy......")
         QtCore.QCoreApplication.instance().quit()
 
-
 from .manager import Manager
-watchdog = AppWatchdog()
+#watchdog = AppWatchdog()
 man = Manager(args=args)
-watchdog.setupParentPoller(man)
-man.sigManagerQuit.connect(watchdog.quitApplication)
+#watchdog.setupParentPoller(man)
+#man.sigManagerQuit.connect(watchdog.quitApplication)

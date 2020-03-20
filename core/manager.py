@@ -99,11 +99,10 @@ class Manager(QtCore.QObject):
             self.tr = None
 
             # Gui setup if we have gui
-            if self.hasGui:
-                import core.gui
-                self.gui = core.gui.Gui()
-                self.gui.setTheme('qudiTheme', os.path.join(self.getMainDir(), 'artwork', 'icons'))
-                self.gui.setAppIcon()
+            import core.gui
+            self.gui = core.gui.Gui()
+            self.gui.setTheme('qudiTheme', os.path.join(self.getMainDir(), 'artwork', 'icons'))
+            self.gui.setAppIcon()
 
             # Read in configuration file
             if args.config == '':
@@ -152,12 +151,13 @@ class Manager(QtCore.QObject):
 
           @return sting: path to configuration file
         """
+        print("here")
         path = self.getMainDir()
         # we first look for config/load.cfg which can point to another
         # config file using the "configfile" key
-        loadConfigFile = os.path.join(path, 'config', 'load.cfg')
+        loadConfigFile = os.path.join(path, 'config', 'default.cfg')
         if os.path.isfile(loadConfigFile):
-            logger.info('load.cfg config file found at {0}'.format(
+            logger.info('default.cfg config file found at {0}'.format(
                 loadConfigFile))
             try:
                 confDict = config.load(loadConfigFile)
@@ -179,11 +179,11 @@ class Manager(QtCore.QObject):
             except Exception:
                 logger.exception('Error while handling load.cfg.')
         # try config/example/custom.cfg next
-        cf = os.path.join(path, 'config', 'example', 'custom.cfg')
+        cf = os.path.join(path, 'config', 'custom.cfg')
         if os.path.isfile(cf):
             return cf
         # try config/example/default.cfg
-        cf = os.path.join(path, 'config', 'example', 'default.cfg')
+        cf = os.path.join(path, 'config', 'default.cfg')
         if os.path.isfile(cf):
             return cf
         raise Exception('Could not find any config file.')
@@ -213,6 +213,7 @@ class Manager(QtCore.QObject):
             configFile))
         logger.info("Starting Manager configuration from {0}".format(
             configFile))
+
         cfg = config.load(configFile)
         self.configFile = configFile
         # Read modules, devices, and stylesheet out of config
