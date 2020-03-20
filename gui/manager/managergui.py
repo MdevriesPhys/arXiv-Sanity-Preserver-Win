@@ -162,28 +162,8 @@ class ManagerGui(GUIBase):
         self.startIPython()
         self.updateIPythonModuleList()
         self.startIPythonWidget()
-        # thread widget
-        self._mw.threadWidget.threadListView.setModel(self._manager.tm)
-        # remote widget
-        # hide remote menu item if rpyc is not available
-        self._mw.actionRemoteView.setVisible(self._manager.rm is not None)
-        if self._manager.rm is not None:
-            self._mw.remoteWidget.remoteModuleListView.setModel(self._manager.rm.remoteModules)
-            if self._manager.remote_server:
-                self._mw.remoteWidget.hostLabel.setText('Server URL:')
-                self._mw.remoteWidget.portLabel.setText(
-                    'rpyc://{0}:{1}/'.format(self._manager.rm.server.host,
-                                             self._manager.rm.server.port))
-                self._mw.remoteWidget.sharedModuleListView.setModel(
-                    self._manager.rm.sharedModules)
-            else:
-                self._mw.remoteWidget.hostLabel.setVisible(False)
-                self._mw.remoteWidget.portLabel.setVisible(False)
-                self._mw.remoteWidget.sharedModuleListView.setVisible(False)
 
         self._mw.configDisplayDockWidget.hide()
-        self._mw.remoteDockWidget.hide()
-        self._mw.threadDockWidget.hide()
         self._mw.show()
 
     def on_deactivate(self):
@@ -238,26 +218,19 @@ class ManagerGui(GUIBase):
         """ Return the dockwidget layout and visibility to its default state """
         self._mw.configDisplayDockWidget.setVisible(False)
         self._mw.consoleDockWidget.setVisible(True)
-        self._mw.remoteDockWidget.setVisible(False)
-        self._mw.threadDockWidget.setVisible(False)
         self._mw.logDockWidget.setVisible(True)
 
         self._mw.actionConfigurationView.setChecked(False)
         self._mw.actionConsoleView.setChecked(True)
-        self._mw.actionRemoteView.setChecked(False)
-        self._mw.actionThreadsView.setChecked(False)
         self._mw.actionLogView.setChecked(True)
 
         self._mw.configDisplayDockWidget.setFloating(False)
         self._mw.consoleDockWidget.setFloating(False)
-        self._mw.remoteDockWidget.setFloating(False)
         self._mw.threadDockWidget.setFloating(False)
         self._mw.logDockWidget.setFloating(False)
 
         self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.configDisplayDockWidget)
         self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(2), self._mw.consoleDockWidget)
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.remoteDockWidget)
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.threadDockWidget)
         self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.logDockWidget)
 
     def handleLogEntry(self, entry):

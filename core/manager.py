@@ -108,7 +108,7 @@ class Manager(QtCore.QObject):
             if args.config == '':
                 config_file = self._getConfigFile()
             else:
-                config_file = args.config
+                config_file = os.path.join(self.getMainDir(), 'config', 'default.cfg')# args.config
             self.configDir = os.path.dirname(config_file)
             self.readConfig(config_file)
 
@@ -125,7 +125,7 @@ class Manager(QtCore.QObject):
                     elif key in self.tree['defined']['logic']:
                         self.startModule('logic', key)
                         self.sigModulesChanged.emit()
-                    elif self.hasGui and key in self.tree['defined']['gui']:
+                    elif True and key in self.tree['defined']['gui']:
                         self.startModule('gui', key)
                         self.sigModulesChanged.emit()
                     else:
@@ -156,6 +156,7 @@ class Manager(QtCore.QObject):
         # we first look for config/load.cfg which can point to another
         # config file using the "configfile" key
         loadConfigFile = os.path.join(path, 'config', 'default.cfg')
+        print(path)
         if os.path.isfile(loadConfigFile):
             logger.info('default.cfg config file found at {0}'.format(
                 loadConfigFile))
@@ -259,7 +260,7 @@ class Manager(QtCore.QObject):
                                            'no module specified'.format(m))
 
                 # GUI
-                elif key == 'gui' and cfg['gui'] is not None and self.hasGui:
+                elif key == 'gui' and cfg['gui'] is not None:
                     for m in cfg['gui']:
                         if 'module.Class' in cfg['gui'][m]:
                             self.tree['defined']['gui'][m] = cfg['gui'][m]
@@ -324,7 +325,7 @@ class Manager(QtCore.QObject):
                         elif m == 'startup':
                             self.tree['global']['startup'] = cfg[
                                 'global']['startup']
-                        elif m == 'stylesheet' and self.hasGui:
+                        elif m == 'stylesheet':
                             self.tree['global']['stylesheet'] = cfg['global']['stylesheet']
                             stylesheetpath = os.path.join(
                                 self.getMainDir(),
@@ -1275,11 +1276,7 @@ class Manager(QtCore.QObject):
                 except:
                     brokenmodules = True
         if lockedmodules:
-            if self.hasGui:
-                self.sigShutdownAcknowledge.emit(lockedmodules, brokenmodules)
-            else:
-                # FIXME: console prompt here
-                self.realQuit()
+            self.sigShutdownAcknowledge.emit(lockedmodules, brokenmodules)
         else:
             self.realQuit()
 
