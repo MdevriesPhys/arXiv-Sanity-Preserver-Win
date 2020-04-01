@@ -115,10 +115,10 @@ class AppWatchdog(QtCore.QObject):
             self.timer.stop()
             logger.info('Closing windows...')
             print('Closing windows...')
-            if manager.hasGui:
-                manager.gui.closeWindows()
+            manager.gui.closeWindows()
             QtCore.QCoreApplication.instance().processEvents()
             logger.info('Stopping threads...')
+            print('Removing sanity...')
             print('Stopping threads...')
             manager.tm.quitAllThreads()
             QtCore.QCoreApplication.instance().processEvents()
@@ -127,7 +127,47 @@ class AppWatchdog(QtCore.QObject):
         QtCore.QCoreApplication.instance().quit()
 
 from .manager import Manager
-#watchdog = AppWatchdog()
+watchdog = AppWatchdog()
 man = Manager(args=args)
 #watchdog.setupParentPoller(man)
-#man.sigManagerQuit.connect(watchdog.quitApplication)
+man.sigManagerQuit.connect(watchdog.quitApplication)
+
+import core.util.helpers as helpers
+interactive = (sys.flags.interactive == 1) and not qtpy.PYSIDE
+
+if interactive:
+    logger.info('Interactive mode; not starting event loop.')
+    print('Interactive mode; not starting event loop.')
+
+    # import some modules which might be useful on the command line
+    import numpy as np
+
+    # Use CLI history and tab completion
+    import atexit
+    import os
+    historyPath = os.path.expanduser("~/.pyhistory")
+    try:
+        import readline
+    except ImportError:
+        print("Import Error in __main__: Module readline not available.")
+    else:
+        import rlcompleter
+        readline.parse_and_bind("tab: complete")
+        if os.path.exists(historyPath):
+            readline.read_history_file(historyPath)
+
+    def save_history(new_historyPath=historyPath):
+        try:
+            import readline
+        except ImportError:
+            print("Import Error in __main__: Module readline not available.")
+        else:
+            readline.write_history_file(new_historyPath)
+    atexit.register(save_history)
+else:
+    # start regular
+    app.exec_()
+    # helpers.exit() causes python to exit before Qt has a chance to
+    # clean up.
+    # This avoids otherwise irritating exit crashes.
+    helpers.exit(watchdog.exitcode)

@@ -129,10 +129,6 @@ class ManagerGui(GUIBase):
         self._mw.statusBar().addWidget(self.versionLabel)
         # Connect up the buttons.
         self._mw.actionQuit.triggered.connect(self._manager.quit)
-        self._mw.actionLoad_configuration.triggered.connect(self.getLoadFile)
-        self._mw.actionReload_current_configuration.triggered.connect(self.reloadConfig)
-        self._mw.actionSave_configuration.triggered.connect(self.getSaveFile)
-        self._mw.action_Load_all_modules.triggered.connect(self._manager.startAllConfiguredModules)
         self._mw.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self._mw.actionAbout_Qudi.triggered.connect(self.showAboutQudi)
         self._mw.actionReset_to_default_layout.triggered.connect(self.resetToDefaultLayout)
@@ -158,10 +154,6 @@ class ManagerGui(GUIBase):
         self.checkTimer = QtCore.QTimer()
         self.checkTimer.start(1000)
         self.updateGUIModuleList()
-        # IPython console widget
-        self.startIPython()
-        self.updateIPythonModuleList()
-        self.startIPythonWidget()
 
         self._mw.configDisplayDockWidget.hide()
         self._mw.show()
@@ -216,21 +208,10 @@ class ManagerGui(GUIBase):
 
     def resetToDefaultLayout(self):
         """ Return the dockwidget layout and visibility to its default state """
-        self._mw.configDisplayDockWidget.setVisible(False)
-        self._mw.consoleDockWidget.setVisible(True)
         self._mw.logDockWidget.setVisible(True)
-
-        self._mw.actionConfigurationView.setChecked(False)
-        self._mw.actionConsoleView.setChecked(True)
         self._mw.actionLogView.setChecked(True)
-
-        self._mw.configDisplayDockWidget.setFloating(False)
-        self._mw.consoleDockWidget.setFloating(False)
         self._mw.threadDockWidget.setFloating(False)
         self._mw.logDockWidget.setFloating(False)
-
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.configDisplayDockWidget)
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(2), self._mw.consoleDockWidget)
         self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.logDockWidget)
 
     def handleLogEntry(self, entry):
