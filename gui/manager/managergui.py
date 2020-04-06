@@ -129,17 +129,11 @@ class ManagerGui(GUIBase):
         self._mw.statusBar().addWidget(self.versionLabel)
         # Connect up the buttons.
         self._mw.actionQuit.triggered.connect(self._manager.quit)
-        self._mw.actionLoad_configuration.triggered.connect(self.getLoadFile)
-        self._mw.actionReload_current_configuration.triggered.connect(self.reloadConfig)
-        self._mw.actionSave_configuration.triggered.connect(self.getSaveFile)
-        self._mw.action_Load_all_modules.triggered.connect(self._manager.startAllConfiguredModules)
         self._mw.actionAbout_Qt.triggered.connect(QtWidgets.QApplication.aboutQt)
         self._mw.actionAbout_Qudi.triggered.connect(self.showAboutQudi)
         self._mw.actionReset_to_default_layout.triggered.connect(self.resetToDefaultLayout)
 
         self._manager.sigShowManager.connect(self.show)
-        self._manager.sigConfigChanged.connect(self.updateConfigWidgets)
-        self._manager.sigModulesChanged.connect(self.updateConfigWidgets)
         self._manager.sigShutdownAcknowledge.connect(self.promptForShutdown)
         # Log widget
         self._mw.logwidget.setManager(self._manager)
@@ -158,31 +152,18 @@ class ManagerGui(GUIBase):
         self.checkTimer = QtCore.QTimer()
         self.checkTimer.start(1000)
         self.updateGUIModuleList()
-        # IPython console widget
-        self.startIPython()
-        self.updateIPythonModuleList()
-        self.startIPythonWidget()
-
-        self._mw.configDisplayDockWidget.hide()
         self._mw.show()
 
     def on_deactivate(self):
         """Close window and remove connections.
         """
-        self.stopIPythonWidget()
-        self.stopIPython()
         self.checkTimer.stop()
         if len(self.modlist) > 0:
             self.checkTimer.timeout.disconnect()
         self.sigStartModule.disconnect()
         self.sigReloadModule.disconnect()
         self.sigStopModule.disconnect()
-        self.sigLoadConfig.disconnect()
-        self.sigSaveConfig.disconnect()
         self._mw.actionQuit.triggered.disconnect()
-        self._mw.actionLoad_configuration.triggered.disconnect()
-        self._mw.actionSave_configuration.triggered.disconnect()
-        self._mw.action_Load_all_modules.triggered.disconnect()
         self._mw.actionAbout_Qt.triggered.disconnect()
         self._mw.actionAbout_Qudi.triggered.disconnect()
         self.saveWindowPos(self._mw)
@@ -216,21 +197,10 @@ class ManagerGui(GUIBase):
 
     def resetToDefaultLayout(self):
         """ Return the dockwidget layout and visibility to its default state """
-        self._mw.configDisplayDockWidget.setVisible(False)
-        self._mw.consoleDockWidget.setVisible(True)
         self._mw.logDockWidget.setVisible(True)
-
-        self._mw.actionConfigurationView.setChecked(False)
-        self._mw.actionConsoleView.setChecked(True)
         self._mw.actionLogView.setChecked(True)
-
-        self._mw.configDisplayDockWidget.setFloating(False)
-        self._mw.consoleDockWidget.setFloating(False)
         self._mw.threadDockWidget.setFloating(False)
         self._mw.logDockWidget.setFloating(False)
-
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.configDisplayDockWidget)
-        self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(2), self._mw.consoleDockWidget)
         self._mw.addDockWidget(QtCore.Qt.DockWidgetArea(8), self._mw.logDockWidget)
 
     def handleLogEntry(self, entry):
@@ -306,17 +276,6 @@ Go, play.
         # the linux style theme which is basically the monokai theme
         self._mw.consolewidget.set_default_style(colors='linux')
 
-    def stopIPython(self):
-        """ Stop the IPython kernel.
-        """
-        self.log.debug('IPy deactivation: {0}'.format(QtCore.QThread.currentThreadId()))
-        self.kernel_manager.shutdown_kernel()
-
-    def stopIPythonWidget(self):
-        """ Disconnect the IPython widget from the kernel.
-        """
-        self._mw.consolewidget.kernel_client.stop_channels()
-
     def updateIPythonModuleList(self):
         """Remove non-existing modules from namespace,
             add new modules to namespace, update reloaded modules
@@ -348,11 +307,6 @@ Go, play.
         self._mw.consolewidget.font_size = fontsize
         self.consoleFontSize = fontsize
         self._mw.consolewidget.reset_font()
-
-    def updateConfigWidgets(self):
-        """ Clear and refill the tree widget showing the configuration.
-        """
-        self.fillTreeWidget(self._mw.treeWidget, self._manager.tree)
 
     def updateGUIModuleList(self):
         """ Clear and refill the module list widget

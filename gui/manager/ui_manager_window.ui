@@ -27,7 +27,7 @@
 						</property>
 						<widget class="QWidget" name="tabWidgetPage1">
 							<attribute name="title">
-								<string>GUI</string>
+								<string>ASP-Win</string>
 							</attribute>
 							<layout class="QGridLayout" name="gridLayout">
 								<item column="0" row="1">
@@ -51,7 +51,7 @@
 						</widget>
 						<widget class="QWidget" name="tabWidgetPage2">
 							<attribute name="title">
-								<string>Logic</string>
+								<string>New Papers</string>
 							</attribute>
 							<layout class="QGridLayout" name="gridLayout">
 								<item column="0" row="0">
@@ -75,7 +75,7 @@
 						</widget>
 						<widget class="QWidget" name="tabWidgetPage3">
 							<attribute name="title">
-								<string>Hardware</string>
+								<string>Saved</string>
 							</attribute>
 							<layout class="QGridLayout" name="gridLayout">
 								<item column="0" row="0">
@@ -114,11 +114,7 @@
 				<property name="title">
 					<string>&amp;Menu</string>
 				</property>
-				<addaction name="actionLoad_configuration" />
-				<addaction name="actionReload_current_configuration" />
-				<addaction name="actionSave_configuration" />
 				<addaction name="separator" />
-				<addaction name="action_Load_all_modules" />
 				<addaction name="separator" />
 				<addaction name="actionQuit" />
 			</widget>
@@ -133,8 +129,6 @@
 				<property name="title">
 					<string>&amp;View</string>
 				</property>
-				<addaction name="actionConfigurationView" />
-				<addaction name="actionConsoleView" />
 				<addaction name="actionLogView" />
 				<addaction name="actionReset_to_default_layout" />
 			</widget>
@@ -142,7 +136,6 @@
 				<property name="title">
 					<string>Settings</string>
 				</property>
-				<addaction name="actionConsoleSettings" />
 			</widget>
 			<addaction name="menuMenu" />
 			<addaction name="menuView" />
@@ -150,45 +143,6 @@
 			<addaction name="menuAbout" />
 		</widget>
 		<widget class="QStatusBar" name="statusbar" />
-		<widget class="QDockWidget" name="configDisplayDockWidget">
-			<property name="enabled">
-				<bool>true</bool>
-			</property>
-			<property name="windowTitle">
-				<string>Configuration</string>
-			</property>
-			<attribute name="dockWidgetArea">
-				<number>8</number>
-			</attribute>
-			<widget class="QWidget" name="dockWidgetContents">
-				<layout class="QVBoxLayout" name="verticalLayout">
-					<item>
-						<widget class="QTreeWidget" name="treeWidget">
-							<property name="sizePolicy">
-								<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-									<horstretch>0</horstretch>
-									<verstretch>0</verstretch>
-								</sizepolicy>
-							</property>
-							<column>
-								<property name="text">
-									<string notr="true">1</string>
-								</property>
-							</column>
-						</widget>
-					</item>
-				</layout>
-			</widget>
-		</widget>
-		<widget class="QDockWidget" name="consoleDockWidget">
-			<property name="windowTitle">
-				<string>Console</string>
-			</property>
-			<attribute name="dockWidgetArea">
-				<number>2</number>
-			</attribute>
-			<widget class="RichJupyterWidget" name="consolewidget" />
-		</widget>
 		<widget class="QDockWidget" name="logDockWidget">
 			<property name="windowTitle">
 				<string>Log</string>
@@ -208,9 +162,6 @@
 			<attribute name="toolBarBreak">
 				<bool>false</bool>
 			</attribute>
-			<addaction name="actionLoad_configuration" />
-			<addaction name="actionSave_configuration" />
-			<addaction name="actionReload_current_configuration" />
 		</widget>
 		<widget class="QToolBar" name="moduleToolBar">
 			<property name="windowTitle">
@@ -222,38 +173,7 @@
 			<attribute name="toolBarBreak">
 				<bool>false</bool>
 			</attribute>
-			<addaction name="action_Load_all_modules" />
 		</widget>
-		<action name="actionLoad_configuration">
-			<property name="icon">
-				<iconset>
-					<normaloff>../../artwork/icons/oxygen/22x22/document-open.png</normaloff>../../artwork/icons/oxygen/22x22/document-open.png
-				</iconset>
-			</property>
-			<property name="text">
-				<string>&amp;Load configuration</string>
-			</property>
-		</action>
-		<action name="actionSave_configuration">
-			<property name="icon">
-				<iconset>
-					<normaloff>../../artwork/icons/oxygen/22x22/document-save.png</normaloff>../../artwork/icons/oxygen/22x22/document-save.png
-				</iconset>
-			</property>
-			<property name="text">
-				<string>&amp;Save configuration</string>
-			</property>
-		</action>
-		<action name="action_Load_all_modules">
-			<property name="icon">
-				<iconset theme="media-playback-start">
-					<normaloff />
-				</iconset>
-			</property>
-			<property name="text">
-				<string> Load &amp;all modules</string>
-			</property>
-		</action>
 		<action name="actionStart_all_modules">
 			<property name="icon">
 				<iconset theme="media-playback-start">
@@ -296,20 +216,6 @@
 				<string>&amp;Log</string>
 			</property>
 		</action>
-		<action name="actionConsoleView">
-			<property name="checkable">
-				<bool>true</bool>
-			</property>
-			<property name="checked">
-				<bool>true</bool>
-			</property>
-			<property name="text">
-				<string>&amp;Console</string>
-			</property>
-			<property name="toolTip">
-				<string>Console settings</string>
-			</property>
-		</action>
 		<action name="actionAbout_Qudi">
 			<property name="icon">
 				<iconset>
@@ -330,17 +236,6 @@
 				<string>About &amp;Qt</string>
 			</property>
 		</action>
-		<action name="actionConfigurationView">
-			<property name="checkable">
-				<bool>true</bool>
-			</property>
-			<property name="checked">
-				<bool>false</bool>
-			</property>
-			<property name="text">
-				<string>C&amp;onfiguration</string>
-			</property>
-		</action>
 		<action name="actionReset_to_default_layout">
 			<property name="text">
 				<string>&amp;Reset to default layout</string>
@@ -354,26 +249,6 @@
 			</property>
 			<property name="text">
 				<string>&amp;Export log as HTML</string>
-			</property>
-		</action>
-		<action name="actionConsoleSettings">
-			<property name="icon">
-				<iconset>
-					<normaloff>../../artwork/icons/oxygen/22x22/utilities-terminal.png</normaloff>../../artwork/icons/oxygen/22x22/utilities-terminal.png
-				</iconset>
-			</property>
-			<property name="text">
-				<string>&amp;Console</string>
-			</property>
-		</action>
-		<action name="actionReload_current_configuration">
-			<property name="icon">
-				<iconset>
-					<normaloff>../../artwork/icons/oxygen/22x22/view-refresh.png</normaloff>../../artwork/icons/oxygen/22x22/view-refresh.png
-				</iconset>
-			</property>
-			<property name="text">
-				<string>&amp;Reload current configuration</string>
 			</property>
 		</action>
 	</widget>
@@ -393,38 +268,6 @@
 	</customwidgets>
 	<resources />
 	<connections>
-		<connection>
-			<sender>actionConsoleView</sender>
-			<signal>toggled(bool)</signal>
-			<receiver>consoleDockWidget</receiver>
-			<slot>setVisible(bool)</slot>
-			<hints>
-				<hint type="sourcelabel">
-					<x>-1</x>
-					<y>-1</y>
-				</hint>
-				<hint type="destinationlabel">
-					<x>971</x>
-					<y>224</y>
-				</hint>
-			</hints>
-		</connection>
-		<connection>
-			<sender>actionConfigurationView</sender>
-			<signal>toggled(bool)</signal>
-			<receiver>configDisplayDockWidget</receiver>
-			<slot>setVisible(bool)</slot>
-			<hints>
-				<hint type="sourcelabel">
-					<x>-1</x>
-					<y>-1</y>
-				</hint>
-				<hint type="destinationlabel">
-					<x>376</x>
-					<y>539</y>
-				</hint>
-			</hints>
-		</connection>
 		<connection>
 			<sender>actionLogView</sender>
 			<signal>toggled(bool)</signal>
